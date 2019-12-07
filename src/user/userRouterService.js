@@ -1,0 +1,22 @@
+const userService = {
+  getUserInfo(db, userId) {
+    return db("users")
+      .where("id", userId)
+      .first();
+  },
+  postNewInfo(db, userInfo) {
+    return db("users")
+      .where("id", userInfo.id)
+      .update({
+        intelligence: userInfo.intelligence,
+        athleticism: userInfo.athleticism,
+        lore: userInfo.lore,
+        health: userInfo.health,
+        insanity: userInfo.insanity,
+        money: userInfo.money,
+        investigation: userInfo.investigation
+      });
+  }
+};
+
+module.exports = userService;
