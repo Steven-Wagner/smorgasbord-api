@@ -36,11 +36,29 @@ const inventoryService = {
   addNewItem(db, userId, quantity, newId) {
     return db("items")
       .insert({
+        item_id: newId,
         agent_id: userId,
-        quantity: quantity,
-        item_id: newId
+        quantity: quantity
       })
       .returning("id");
+  },
+  getShoppingItems(db) {
+    return db("items_description").where("purchasable", true);
+  },
+  checkUserAlreadyHas(db, itemId, userId) {
+    console.log("test", itemId);
+    return db("items")
+      .where("item_id", itemId)
+      .where("agent_id", userId);
+  },
+  addQuantity(db, itemId, userId, quantity, alreadyHas) {
+    console.log("test2", itemId);
+    return db("items")
+      .where("item_id", itemId)
+      .where("agent_id", userId)
+      .update({
+        quantity: parseInt(quantity) + parseInt(alreadyHas.quantity)
+      });
   }
 };
 

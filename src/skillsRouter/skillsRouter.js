@@ -51,4 +51,18 @@ skillsRouter
       });
   });
 
+skillsRouter.route("/new-skill/").post(jsonBodyParser, (req, res, next) => {
+  const newSkill = req.body;
+  console.log("newSkill", newSkill);
+
+  skillsService
+    .postNewSkill(req.app.get("db"), newSkill)
+    .then(newSkillId => {
+      res.status(200).json(newSkillId);
+    })
+    .catch(error => {
+      next(error);
+    });
+});
+
 module.exports = skillsRouter;

@@ -68,19 +68,90 @@ function makeSkillsArray() {
 function makeSkillsDescriptions() {
   return [
     {
-      id: 1,
-      name: "Driving",
-      description: "You can drive good"
+      name: "stealth",
+      description: "How sneaky you can be"
     },
     {
-      id: 2,
-      name: "Fighting",
-      description: "You can fight good"
+      name: "driving",
+      description: "You can drive anything"
     },
     {
-      id: 3,
-      name: "Smiling",
-      description: "You can smile good"
+      name: "medical",
+      description: "You have medical training"
+    },
+    {
+      name: "intimidation",
+      description: "You look scary"
+    },
+    {
+      name: "survival",
+      description: "You know the outdoors"
+    },
+    {
+      name: "tracking",
+      description: "You can track animals"
+    },
+    {
+      name: "mechanics",
+      description: "You can repair and build mechanical equipment"
+    },
+    {
+      name: "chemistry",
+      description:
+        "You know how to use base ingredients to build special compounds"
+    },
+    {
+      name: "charm",
+      description: "People like you. No one knows why"
+    },
+    {
+      name: "gadgets",
+      description: "You can work well with all electronic equipment"
+    },
+    {
+      name: "slight of hand",
+      description: "You have sticky fingers and quick reflexes"
+    },
+    {
+      name: "biology",
+      description: "You know a lot about animals"
+    },
+    {
+      name: "performance",
+      description: "You have a knack for showbiz"
+    },
+    {
+      name: "fishing",
+      description:
+        "You can catch fish, throw line, and gut them with the best of them"
+    },
+    {
+      name: "hunting",
+      description:
+        "You have skill with a rifle and traps to catch and/or kill animals"
+    },
+    {
+      name: "divining",
+      description:
+        "You can use two sticks divine the whereabouts of water and other elements"
+    },
+    {
+      name: "religion",
+      description:
+        "You have knowledge of many different religious beliefs and practices. Including ancient and cult beliefs."
+    },
+    {
+      name: "homeopathy",
+      description:
+        "All natural medicine that helps the mind more than the physical"
+    },
+    {
+      name: "phycology",
+      description: "You understand the inner workings of the mind"
+    },
+    {
+      name: "hand to hand combat",
+      description: "You have great hand to hand combat and fighting skills"
     }
   ];
 }
@@ -88,18 +159,101 @@ function makeSkillsDescriptions() {
 function makeItemsDescriptions() {
   return [
     {
-      id: 1,
-      name: "stick",
-      description: "Its a stick",
-      cost: "1",
+      name: "Knife",
+      description: "+1 to hand to hand combat",
+      cost: 5,
       purchasable: true
     },
     {
-      id: 2,
-      name: "rock",
-      description: "Its a rock",
-      cost: "2",
+      name: "Turkey Bone",
+      description: "A bone of a dead fowl. Smells like it too.",
+      cost: 1,
       purchasable: true
+    },
+    {
+      name: "Gasoline",
+      description: "Petrol, fuel, gas. It makes some things go.",
+      purchasable: true,
+      cost: 10
+    },
+    {
+      name: "Spot Light",
+      description:
+        "Shines a lite 100 yards but only in a 10 foot cone. So large that it must be hld with both hands.",
+      purchasable: true,
+      cost: 100
+    },
+    {
+      name: "Gizzards",
+      description: `a muscular, thick-walled part of a bird's stomach for grinding food.`,
+      purchasable: true,
+      cost: 1
+    },
+    {
+      name: "Tent",
+      description: `A small 2 person tent. Possibly rain resistant`,
+      purchasable: true,
+      cost: 50
+    },
+    {
+      name: "Rope",
+      description: `50 feet of rope`,
+      purchasable: true,
+      cost: 5
+    },
+    {
+      name: "Cheap Backpack",
+      description: `Allows you to carry double your weight capacity`,
+      purchasable: true,
+      cost: 50
+    },
+    {
+      name: "Expensive Backpack",
+      description: `Allows you to carry double your weight capacity and have two extra items at the ready.`,
+      purchasable: true,
+      cost: 150
+    },
+    {
+      name: "Rusted Revolver",
+      description: `Rusted shut. It may have zero to 6 bullets in it.`,
+      purchasable: true,
+      cost: 50
+    },
+    {
+      name: "Native American Totem",
+      description: `Six foot tall totem. Origins unknown.`,
+      purchasable: true,
+      cost: 200
+    },
+    {
+      name: "Bigfoot Postcard",
+      description: `Famous local photo of Bigfoot. Photographer Unknown.`,
+      purchasable: true,
+      cost: 1
+    },
+    {
+      name: "Waterproof Sack",
+      description: `Can fit about 10 pounds of items. Things inside the pouch will not get wet.`,
+      purchasable: true,
+      cost: 35
+    },
+    {
+      name: "Snare Trap",
+      description: `The loop of wire is suspended from a branch or small tree and the snare catches an animal by the neck as it is walking along the trail.`,
+      purchasable: true,
+      cost: 200
+    },
+    {
+      name: "Padded Steel Jaw Traps",
+      description: `Snaps onto an animals limbs with some minimal padding`,
+      purchasable: true,
+      cost: 200
+    },
+    {
+      name: "Steel Jaw Traps",
+      description: `Crush animals' limbs and are so painful that animals sometimes mutilate their own bodies in an attempt to free themselves.`,
+      purchasable: true,
+      cost: 200
     }
   ];
 }
@@ -179,7 +333,12 @@ function seedNotes(db, notes) {
 }
 
 function seedUsers(db, users) {
-  return db.into("users").insert(users);
+  preparedUsers = users.map(user => {
+    const newUser = Object.assign({}, user);
+    delete newUser.id;
+    return newUser;
+  });
+  return db.into("users").insert(preparedUsers);
 }
 
 function seedSkillsDescriptions(db, skills) {
@@ -187,7 +346,12 @@ function seedSkillsDescriptions(db, skills) {
 }
 
 function seedUsersSkills(db, skills) {
-  return db.into("skills").insert(skills);
+  preparedSkills = skills.map(skill => {
+    const newSkill = Object.assign({}, skill);
+    delete newSkill.id;
+    return newSkill;
+  });
+  return db.into("skills").insert(preparedSkills);
 }
 
 function seedUsersItems(db, items) {

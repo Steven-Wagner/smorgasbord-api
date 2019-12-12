@@ -6,7 +6,7 @@ const userService = {
   },
   postNewInfo(db, userInfo) {
     return db("users")
-      .where("id", userInfo.id)
+      .where("id", userInfo.userId)
       .update({
         intelligence: userInfo.intelligence,
         athleticism: userInfo.athleticism,
@@ -16,6 +16,26 @@ const userService = {
         money: userInfo.money,
         investigation: userInfo.investigation
       });
+  },
+  insertNewUser(db, userInfo) {
+    return db("users")
+      .insert({
+        username: userInfo.username,
+        password: userInfo.password,
+        athleticism: userInfo.athleticism,
+        health: userInfo.health,
+        insanity: userInfo.insanity,
+        intelligence: userInfo.intelligence,
+        investigation: userInfo.investigation,
+        lore: userInfo.lore,
+        money: userInfo.money
+      })
+      .returning("id");
+  },
+  insertNewSkills(db, newSkills) {
+    return db("skills")
+      .insert(newSkills)
+      .returning("id");
   }
 };
 

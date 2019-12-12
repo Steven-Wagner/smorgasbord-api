@@ -21,6 +21,15 @@ inventoryRouter.get("/:userId", jsonBodyParser, (req, res, next) => {
     .catch(next);
 });
 
+inventoryRouter.get("/shopping/whalmart", jsonBodyParser, (req, res, next) => {
+  inventoryService
+    .getShoppingItems(req.app.get("db"))
+    .then(items => {
+      res.send(items);
+    })
+    .catch(next);
+});
+
 inventoryRouter
   .route("/:itemId/:quantity")
   .patch(jsonBodyParser, (req, res, next) => {
@@ -40,28 +49,54 @@ inventoryRouter
   .route("/:userId/")
   .post(jsonBodyParser, async function(req, res, next) {
     const { userId } = req.params;
-    const { name, description, quantity } = req.body;
+    const { name, description, quantity, item_id } = req.body;
+    let alreadyHas = [];
+    console.log("itemid", item_id);
+    console.log("name", name);
 
     let newId = await inventoryService.checkItemExists(req.app.get("db"), name);
     if (newId) {
       newId = newId.id;
     }
+    console.log("newid", newId);
     let newItemId;
 
-    if (!newId) {
-      newId = await inventoryService.insertNewItem(
+    if (item_id || newId) {
+      alreadyHas = await inventoryService.checkUserAlreadyHas(
         req.app.get("db"),
-        name,
-        description
+        item_id || newId,
+        userId
       );
     }
-    if (newId > 0) {
-      newItemId = await inventoryService.addNewItem(
+    console.log("alrewadyhas", alreadyHas);
+
+    if (alreadyHas.length > 0) {
+      console.log("addquantity", alreadyHas[0]);
+      console.log("quanity", quantity);
+      await inventoryService.addQuantity(
         req.app.get("db"),
+        item_id || newId,
         userId,
         quantity,
-        newId[0] || newId
+        alreadyHas[0]
       );
+      return res.status(200).json({});
+    } else {
+      if (!newId) {
+        newId = await inventoryService.insertNewItem(
+          req.app.get("db"),
+          name,
+          description
+        );
+      }
+      if (newId > 0) {
+        newItemId = await inventoryService.addNewItem(
+          req.app.get("db"),
+          userId,
+          quantity,
+          newId[0] || newId
+        );
+      }
     }
     if (newId == null || newItemId == null) {
       return res.status(400).json({
@@ -69,7 +104,7 @@ inventoryRouter
       });
     }
     if (newItemId) {
-      res.status(201).json(newItemId);
+      res.status(201).json(newItemId[0]);
     }
   });
 

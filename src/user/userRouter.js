@@ -28,12 +28,39 @@ userRouter.get("/:userId", jsonBodyParser, (req, res, next) => {
 });
 
 userRouter.route("/edit/").post(jsonBodyParser, (req, res, next) => {
-  const { userInfo } = req.body;
+  const userInfo = req.body;
+
+  console.log("userInfo", userInfo);
 
   userService
     .postNewInfo(req.app.get("db"), userInfo)
     .then(newInfo => {
       res.status(200).json(newInfo);
+    })
+    .catch(error => {
+      next(error);
+    });
+});
+
+userRouter.route("/new/").post(jsonBodyParser, (req, res, next) => {
+  const userInfo = req.body;
+
+  console.log("userInfo", userInfo);
+
+  userService
+    .insertNewUser(req.app.get("db"), userInfo)
+    .then(userId => {
+      console.log("userId", userId[0]);
+      const preppedSkills = userInfo.skills.map(skill => {
+        return {
+          agent_id: userId[0],
+          level: Math.round(skill.score),
+          skill_id: skill.id
+        };
+      });
+      userService.insertNewSkills(req.app.get("db"), preppedSkills).then(() => {
+        res.status(200).json(userId);
+      });
     })
     .catch(error => {
       next(error);
